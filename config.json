@@ -1,0 +1,330 @@
+{
+"_comment_path" : "This section is for path",
+    "path": {
+        "dir_to_wacth": "/home/mavericbigdata12/Project_loan_default/Wacther_Script/Watcher",
+
+		"data_file_path": "/user/mavericbigdata12/Project_loan_default/Loan_Default.csv",  
+		"output_path_clean" : "/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_cleased.parquet",
+        "xyz_path": "/home/mavericbigdata12/Project_loan_default",
+		
+		"input_to_massage": "/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_cleased.parquet",
+		"output_to_massage" : "/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_massaged.parquet",
+		"input_to_transform" : "/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_massaged.parquet",
+		"output_to_transform" : "/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_transformed.parquet",
+        "transformed_df" : "/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_transformed1.parquet",
+		"cleanse_script" : "/home/mavericbigdata12/Project_loan_default/Scripts/cleaning.py",
+		"hdfs_script" : "/home/mavericbigdata12/Project_loan_default/Scripts/wrapper.py",
+		"massage_script" : "/home/mavericbigdata12/Project_loan_default/Scripts/massaging.py",
+		"transform_script" : "/home/mavericbigdata12/Project_loan_default/Scripts/transformation.py",
+		"hive_script" : "/home/mavericbigdata12/Project_loan_default/Scripts/hive_connect.py",
+        
+        "watched_directory": "/home/mavericbigdata12/Project_loan_default/Watcher_Script/Watcher",
+        "log_file": "/home/mavericbigdata12/Project_loan_default/Watcher_Script/file_watcher1.log",
+        "wrapper_script": "/home/mavericbigdata12/Project_loan_default/Scripts/wrapper.py",
+        "source_path":"/user/mavericbigdata12/Project_loan_default/Loan_Default.csv",
+        "destination_path":"/user/mavericbigdata12/Project_loan_default/Data/Loan_Default_transformed1.parquet"
+		
+	},
+
+
+    
+     "spark" :{
+        "warehouse_dir" : "/user/hive/warehouse",
+        "metastore_uris" : "thrift://ip-10-1-2-24.ap-south-1.compute.internal:9083",
+        "database_name" : "project_ld",
+        "table_name" : "loan_default"
+    },
+    
+    
+"_comment_Cleansing" : "This section is for configuration for cleansing script.",
+    "columns_to_winsorize":["LTV", "income", "loan_amount", "property_value", "Upfront_charges"],
+	"threshold":3,
+	"inconsistant_column" : ["LTV", "Interest_rate_spread"],
+	"typing_error_inaccuracies" : {
+            "Security_Type": {"Indriect": "Indirect"}
+        },
+	"null_threshold" : 6,
+	"columns2convert_data" : ["year","Status"],
+	"datetime_columns" : ["year"],
+	"irrelevant_columns" : ["ID","year","construction_type","Secured_by","Security_Type"],
+	"Text_encoding":"utf-8",
+	"inconsistant_unit_column" : ["Upfront_charges"],
+	"reference_df" : [],
+	"foreign_key_columns" : [],
+	"address" : [],
+    
+	"hashing_privacy" : {
+		 "columns_to_hash" : ["ID"],
+		 "hash_length" : 256
+	},
+    
+	"integration_issue_col" : {
+		"Security_Type": {"0": "Non_Defaulter", "1": "Defaulter"}
+	},
+    
+    "standardizing_column" : {
+            "Gender": {"Male": "M", "Female": "F", "Joint": "J", "Sex Not Available": "SNA"},
+            "loan_limit": {"cf": "CF", "ncf": "NCF"},
+            "approv_in_adv": {"pre": "P", "nopre": "NP"},
+            "loan_type": {"type1": "T1", "type2": "T2", "type3": "T3"},
+            "business_or_commercial": {"nob/c" : "NBC", "b/c" : "BC"}
+        },
+
+
+"_comment_Massaging" : "This section is for configuration for massaging script.",
+    "columns2convert_data": ["year", "Status"],
+    "concatenate_columns_1": ["col1", "col2"],
+    "Subset_column": ["Status", 1],
+    "rounding_after_cleaning" : ["loan_amount", "property_value", "income"],
+    "to_imputation": {
+        "age":"NA",
+        "approv_in_adv" : "NP"
+    },
+
+
+"_comment_Transformtion" : "This section is for configuration for transformtion script.",     
+    "reshaping_col":{
+        "col":"region",
+        "pivot_by":"loan_type",
+        "col_to_agg":"loan_amount"
+        },
+    "data_agg":{
+        "col_to_group":"loan_type",
+        "col_to_sum":"loan_amount"
+        },
+    "filter1":{
+        "col_to_filter":"Credit_Score",
+        "filter_value":750
+    },
+    "col_to_extract":["Credit_Score", "loan_amount", "property_value","rate_of_interest","dtir1","income","LTV","Upfront_charges","Status"],
+    "col_to_normalize":["loan_amount","Upfront_charges","property_value","income","LTV"],
+    "col_to_fillna":["Credit_Score", "loan_amount", "property_value","rate_of_interest","dtir1","income","LTV","Upfront_charges"],
+    "col_to_sort":"loan_amount",
+    "split_by_status":[1,0],
+    "redundancy_columns":["Secured_by","construction_type","Security_Type","year","ID"],
+    
+    "col_to_convert":["loan_amount","property_value"],
+    "columns_to_round":["LTV", "income", "loan_amount", "property_value", "Upfront_charges"],
+    "cols_to_binning":{
+            "credit_score":[[0, 500, 600, 700, 800, 900], ["Poor", "Fair", "Good", "Very Good", "Excellent"]]
+                      },
+    
+    "col_to_describe":["loan_amount","rate_of_interest","Interest_rate_spread","Upfront_charges","term","property_value","income","Credit_Score","LTV"],
+    "col_to_round":["rate_of_interest", "Interest_rate_spread", "Upfront_charges"],
+
+
+"_comment_Validation" : "This section is for configuration for validation script.", 
+    "dec_col_to_check" : ["LTV", "Interest_rate_spread"],
+    "data_to_check": ["DIRECT", "INDIRECT"],
+    "std_col_to_check":["Gender","loan_limit","approv_in_adv","loan_type","business_or_commercial"],
+   
+    
+    
+	"data_schema": {
+		"ID": true,
+		"year": true,
+		"loan_limit": true,
+		"Gender": true,
+		"approv_in_adv": true,
+		"loan_type": true,
+		"loan_purpose": true,
+		"Credit_Worthiness": true,
+		"open_credit": true,
+		"business_or_commercial": true,
+		"loan_amount": true,
+		"rate_of_interest": true,
+		"Interest_rate_spread": true,
+		"Upfront_charges": true,
+		"term": true,
+		"Neg_ammortization": true,
+		"interest_only": true,
+		"lump_sum_payment": true,
+		"property_value": true,
+		"construction_type": true,
+		"occupancy_type": true,
+		"Secured_by": true,
+		"total_units": true,
+		"income": true,
+		"credit_type": true,
+		"Credit_Score": true,
+		"co-applicant_credit_type": true,
+		"age": true,
+		"submission_of_application": true,
+		"LTV": true,
+		"Region": true,
+		"Security_Type": true,
+		"Status": true,
+		"dtir1": true
+	},
+
+    
+"_comment_Cleansing_funtions" : "This section is for configuration for cleansing function.",
+	"cleansing_config": {
+		"remove_duplicates": true,
+		"handle_missing_values": true,
+		"standardize_data": false,
+		"correct_typos_and_inaccuracies": true,
+		"handle_outliers": true,
+		"handle_inconsistent_data": true,
+		"handle_incomplete_records": true,
+		"convert_data_types": true,
+		"normalize_numerical_features": false,
+		"standardize_categorical_data": true,
+		"validate_data": false,
+		"address_inconsistencies_in_date_time_formats": false,
+		"remove_irrelevant_information": false,
+		"handle_encoding_issues": true,
+		"deal_with_inconsistent_units": true,
+		"resolve_data_integration_issues": false,
+		"validate_references_and_foreign_keys": false,
+		"geocode_and_address_validation": false,
+		"handle_special_characters_and_symbols": true,
+		"conform_to_data_privacy_regulations": true
+	},
+    
+    
+"_comment_massaging_funtions" : "This section is for configuration for massaging function.",
+	"massaging": {
+		"data_validation": true,
+		"data_verification": true,
+		"data_conversion": true,
+		"data_formatting": true,
+		"parse_address": false,
+		"data_cleaning": false,
+		"data_enrichment": false,
+		"data_standardization": false,
+		"data_deduplication": true,
+		"data_imputation": true,
+		"data_normalization": true,
+		"concatenate_columns": false,
+		"redact_sensitive_info": false,
+        "data_filtering":false,
+		"data_sampling": false,
+		"subset_extraction": false,
+		"transform_data": false,
+		"reconcile_data": false,
+		"aggregate_data": false,
+		"data_versioning": false
+	},
+    
+    
+"_comment_transforming_funtions" : "This section is for configuration for transforming function.",    
+    "transforming": {
+		"data_aggregation": true,
+		"data_filtering": true,
+		"data_sorting": true,
+		"data_joining_and_merging": false,
+		"data_splitting":false,
+		"data_reshaping": false,
+		"data_transposition": false,
+		"data_imputation": false,
+		"data_normalization": false,
+		"data_encoding": false,
+		"data_scaling": false,
+		"data_agg_timeframes": false,
+		"data_binning": false,
+		"data_extraction": true,
+		"data_duplication": true,
+		"data_sampling": false,
+		"data_transform_by_cal": false,
+		"data_conversion": true,
+		"data_parsing": false,
+		"data_redundancy_removal": true
+	},
+
+    "_comment_Validation_funtions" : "This section is for configuration for validation function.",
+	"validation_config": {
+		"schema_validation": true,
+		"datatypes_validation": true,
+		"duplicates": true,
+		"row_coulumn_count": true,
+		"check_uppercase": true,
+		"null_count_validation": true,
+		"decimal_validation": true,
+		"spelling_validation": true,
+		"standardization_check": true,
+		"special_char_check": true
+	 },
+    
+    
+    
+	"schema": {
+		"columns": [
+			"ID",
+			"year",
+			"loan_limit",
+			"Gender",
+			"approv_in_adv",
+			"loan_type",
+			"loan_purpose",
+			"Credit_Worthiness",
+			"open_credit",
+			"business_or_commercial",
+			"loan_amount",
+			"rate_of_interest",
+			"Interest_rate_spread",
+			"Upfront_charges",
+			"term",
+			"Neg_ammortization",
+			"interest_only",
+			"lump_sum_payment",
+			"property_value",
+			"construction_type",
+			"occupancy_type",
+			"Secured_by",
+			"total_units",
+			"income",
+			"credit_type",
+			"Credit_Score",
+			"co-applicant_credit_type",
+			"age",
+			"submission_of_application",
+			"LTV",
+			"Region",
+			"Security_Type",
+			"Status",
+			"dtir1"
+			]
+		},
+    
+	"hive_schema": {
+		"type": "struct",
+		"fields": [
+			{"name": "ID", "type": "int", "nullable": true},
+			{"name": "year", "type": "int", "nullable": true},
+			{"name": "loan_limit", "type": "string", "nullable": true},
+			{"name": "Gender", "type": "string", "nullable": true},
+			{"name": "approv_in_adv", "type": "string", "nullable": true},
+			{"name": "loan_type", "type": "string", "nullable": true},
+			{"name": "loan_purpose", "type": "string", "nullable": true},
+			{"name": "Credit_Worthiness", "type": "string", "nullable": true},
+			{"name": "open_credit", "type": "string", "nullable": true},
+			{"name": "business_or_commercial", "type": "string", "nullable": true},
+			{"name": "loan_amount", "type": "int", "nullable": true},
+			{"name": "rate_of_interest", "type": "double", "nullable": true},
+			{"name": "Interest_rate_spread", "type": "double", "nullable": true},
+			{"name": "Upfront_charges", "type": "double", "nullable": true},
+			{"name": "term", "type": "int", "nullable": true},
+			{"name": "Neg_ammortization", "type": "string", "nullable": true},
+			{"name": "interest_only", "type": "string", "nullable": true},
+			{"name": "lump_sum_payment", "type": "string", "nullable": true},
+			{"name": "property_value", "type": "int", "nullable": true},
+			{"name": "construction_type", "type": "string", "nullable": true},
+			{"name": "occupancy_type", "type": "string", "nullable": true},
+			{"name": "Secured_by", "type": "string", "nullable": true},
+			{"name": "total_units", "type": "string", "nullable": true},
+			{"name": "income", "type": "int", "nullable": true},
+			{"name": "credit_type", "type": "string", "nullable": true},
+			{"name": "Credit_Score", "type": "int", "nullable": true},
+			{"name": "co-applicant_credit_type", "type": "string", "nullable": true},
+			{"name": "age", "type": "string", "nullable": true},
+			{"name": "submission_of_application", "type": "string", "nullable": true},
+			{"name": "LTV", "type": "double", "nullable": true},
+			{"name": "Region", "type": "string", "nullable": true},
+			{"name": "Security_Type", "type": "string", "nullable": true},
+			{"name": "Status", "type": "string", "nullable": true},
+			{"name": "dtir1", "type": "int", "nullable": true}
+			]
+		}
+}
+
